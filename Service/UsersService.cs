@@ -5,28 +5,33 @@ using Zxcvbn;
 
 namespace Service
 {
-    public class UsersService
+    public class UsersService : IUsersService
     {
-        UsersRepository repository = new UsersRepository();
+        IUsersRepository _UserRepository;
+        public UsersService(IUsersRepository UserRepository)
+        {
+            _UserRepository = UserRepository;
+        }
+
         public User Login(User user)
         {
-            return repository.FindUser(user);
+            return _UserRepository.FindUser(user);
         }
 
         public User Register(User newUser)
         {
-            if (GetPasswordRate(newUser.Password)>=2&&!repository.IsUserNameExist(newUser.Email))
-                return repository.AddUser(newUser);
+            if (GetPasswordRate(newUser.Password) >= 2 && !_UserRepository.IsUserNameExist(newUser.Email))
+                return _UserRepository.AddUser(newUser);
             return null;
         }
 
-        public Boolean UpdateUser(int id,User userToUpdate)
+        public Boolean UpdateUser(int id, User userToUpdate)
         {
-            User user = repository.GetUser(id);
+            User user = _UserRepository.GetUser(id);
             //if(!user) return false
-            if (user.Email != userToUpdate.Email && repository.IsUserNameExist(userToUpdate.Email))
+            if (user.Email != userToUpdate.Email && _UserRepository.IsUserNameExist(userToUpdate.Email))
                 return false;
-            repository.UpdateUser(id, userToUpdate);
+            _UserRepository.UpdateUser(id, userToUpdate);
             return true;
         }
 

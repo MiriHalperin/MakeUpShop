@@ -1,23 +1,19 @@
-﻿using System.ComponentModel.DataAnnotations;
-namespace entities
+﻿using System;
+using System.Collections.Generic;
+
+namespace MyShop;
+
+public partial class User
 {
-    public class User
-    {
-        public static int Index = 0;
+    public int UserId { get; set; }
 
+    public string Email { get; set; } = null!;
 
-        public int Id { get; set; }
-         
+    public string? FirstName { get; set; }
 
-        [EmailAddress(ErrorMessage ="Email not valid")]
-        public string Email { get; set; }
-        public string? FirstName { get; set; }
-        public string? LastName { get; set; }
+    public string? LastName { get; set; }
 
-        [StringLength(20, ErrorMessage = "password length must be between 5-20", MinimumLength = 5)]
-        public string Password { get; set; }
-        
-       
-    }
+    public string Password { get; set; } = null!;
+
+    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 }
- 

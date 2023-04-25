@@ -3,7 +3,7 @@ using entities;
 
 namespace Repository
 {
-    public class UsersRepository
+    public class UsersRepository : IUsersRepository
     {
         string filePath = "./users.txt";
         public User FindUser(User userToFind)
