@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace entities;
 
-public partial class User
+
+public partial class UserDTO
 {
     public int UserId { get; set; }
 
@@ -15,5 +17,5 @@ public partial class User
 
     public string Password { get; set; } = null!;
 
-    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
+    public virtual ICollection<OrderDTO> Orders { get; set; } = new List<OrderDTO>();
 }

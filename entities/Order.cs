@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MyShop;
+namespace entities;
 
 public partial class Order
 {

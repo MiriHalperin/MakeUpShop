@@ -4,10 +4,11 @@ namespace Repository
 {
     public interface IUsersRepository
     {
-        User AddUser(User newUser);
-        User FindUser(User userToFind);
-        User GetUser(int id);
-        bool IsUserNameExist(string Email);
-        void UpdateUser(int id, User userToUpdate);
+        Task<User> AddUser(User newUser);
+        Task<User> FindUser(User userToFind);
+        Task<bool> IsUserNameExist(string Email);
+        Task UpdateUser(User updatedUser, int id);      
+         Task<User> getUserById(int id);
+
     }
 }

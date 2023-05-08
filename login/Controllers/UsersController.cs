@@ -1,7 +1,9 @@
 ﻿using entities;
 using Microsoft.AspNetCore.Mvc;
 using Service;
+using AutoMapper;
 using System.Text.Json;
+
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -13,45 +15,53 @@ namespace Login.Controllers
     {
 
         IUsersService _usersService;
-        public UsersController(IUsersService usersService)
+        IMapper _mapper;
+        public UsersController(IUsersService usersService, IMapper mapper)
         {
             _usersService = usersService;
+            _mapper = mapper;
+        }
+
+        // GET api/<UserController>/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<UserDTO>> Get(int id)
+        {
+            User user = await _usersService.GetUserById(id);
+            UserDTO userDTO = _mapper.Map<User, UserDTO>(user);
+            return userDTO != null ? userDTO : NoContent();
         }
 
         // POST api/<UserController>
         [HttpPost("Login")]
-        public ActionResult<User> Login([FromBody] User userFromBody)
-        {
-            User user = _usersService.Login(userFromBody);
-            if (user == null)
+        public async Task<ActionResult<UserDTO>> Login([FromBody] UserDTO userDto)
+        {            
+            User newUser = _mapper.Map<UserDTO,User >(userDto);
+            User user =await _usersService.Login(newUser);
+            UserDTO userDTO = _mapper.Map<User, UserDTO>(user);
+
+            if (userDTO == null)
                 return Unauthorized();
-            return Ok(user);
+            return Ok(userDTO);
 
         }
 
-        [HttpPost]
-        public ActionResult<User> Register([FromBody] User newUser)
+        [HttpPost("register")]
+        public async Task<ActionResult?> Register([FromBody] UserDTO newUserDTO)
         {
-            User userCreated = _usersService.Register(newUser);
-            if (userCreated != null)
-                return Ok(userCreated);
-            return BadRequest("user name exist");
+            User newUser = _mapper.Map<UserDTO, User>(newUserDTO);
+            User user = await _usersService.Register(newUser);
+            UserDTO userDTO = _mapper.Map<User, UserDTO>(user);
+            return userDTO != null ? CreatedAtAction(nameof(Get), new { id = userDTO.UserId }, userDTO) : BadRequest();
         }
 
-        [HttpPost("password")]
-        public int checkPassword([FromBody] string password)
-        {
-            return _usersService.GetPasswordRate(password);
-        }
 
         // PUT api/<UserController>/5
         [HttpPut("{id}")]
-        public ActionResult<User> Put(int id, [FromBody] User userToUpdate)
+        public async Task Put(int id, [FromBody] UserDTO userToUpdateDTO)
         {
-            if (_usersService.UpdateUser(id, userToUpdate))
-                return userToUpdate;
-            return BadRequest("user name exist");
-            
+            User updatedUser = _mapper.Map<UserDTO, User>(userToUpdateDTO);
+            await _usersService.UpdateUser(id, updatedUser);
+
         }
     }
 }

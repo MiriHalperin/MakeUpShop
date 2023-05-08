@@ -1,43 +1,45 @@
 ﻿using entities;
 using Repository;
+using Service;
 using Zxcvbn;
 
 
 namespace Service
 {
-    public class UsersService : IUsersService
+    public class UsersService : IUsersService                               
     {
         IUsersRepository _UserRepository;
-        public UsersService(IUsersRepository UserRepository)
+        IPasswordService _passwordService;
+
+        public UsersService(IUsersRepository UserRepository, IPasswordService passwordService)
         {
             _UserRepository = UserRepository;
+            _passwordService= passwordService;
+
         }
 
-        public User Login(User user)
+        public async Task<User> Login(User user)
         {
-            return _UserRepository.FindUser(user);
+            return await _UserRepository.FindUser(user);
         }
 
-        public User Register(User newUser)
+        public async Task<User> Register(User newUser)
         {
-            if (GetPasswordRate(newUser.Password) >= 2 && !_UserRepository.IsUserNameExist(newUser.Email))
-                return _UserRepository.AddUser(newUser);
-            return null;
+            if (await _passwordService.goodPassword(newUser.Password) >= 1)
+                return await _UserRepository.AddUser(newUser);
+            else
+                return null;
         }
 
-        public Boolean UpdateUser(int id, User userToUpdate)
+        public async Task UpdateUser(int id, User userToUpdate)
         {
-            User user = _UserRepository.GetUser(id);
-            //if(!user) return false
-            if (user.Email != userToUpdate.Email && _UserRepository.IsUserNameExist(userToUpdate.Email))
-                return false;
-            _UserRepository.UpdateUser(id, userToUpdate);
-            return true;
+            await _UserRepository.UpdateUser(userToUpdate,id);
         }
 
-        public int GetPasswordRate(string password)
+
+        public async Task<User> GetUserById(int id)
         {
-            return Zxcvbn.Core.EvaluatePassword(password).Score;
+            return await _UserRepository.getUserById(id);
         }
     }
 }

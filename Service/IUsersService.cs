@@ -4,9 +4,10 @@ namespace Service
 {
     public interface IUsersService
     {
-        int GetPasswordRate(string password);
-        User Login(User user);
-        User Register(User newUser);
-        bool UpdateUser(int id, User userToUpdate);
+        Task<User> Login(User user);
+        Task<User> Register(User newUser);
+        Task UpdateUser(int id, User userToUpdate);
+        Task<User> GetUserById(int id);
+
     }
 }

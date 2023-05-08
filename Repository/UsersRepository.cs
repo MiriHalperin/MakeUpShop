@@ -1,83 +1,56 @@
 ﻿using System.Text.Json;
 using entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Repository
 {
     public class UsersRepository : IUsersRepository
     {
-        string filePath = "./users.txt";
-        public User FindUser(User userToFind)
-        {
-            using (StreamReader reader = System.IO.File.OpenText(filePath))
-            {
-                string? currentUserInFile;
-                while ((currentUserInFile = reader.ReadLine()) != null)
-                {
-                    User userFromFile = JsonSerializer.Deserialize<User>(currentUserInFile);
-                    if (userFromFile.Email == userToFind.Email && userFromFile.Password == userToFind.Password)
-                        return userFromFile;
-                }
+        MakeUpContext _makeUpContext;
 
-                return null;
-            }
-        }
-        public bool IsUserNameExist(string Email)
+        public UsersRepository(MakeUpContext makeUpContext)
         {
-            using (StreamReader reader = System.IO.File.OpenText(filePath))
-            {
-                string? currentUserInFile;
-                while ((currentUserInFile = reader.ReadLine()) != null)
-                {
-                    User userFromFile = JsonSerializer.Deserialize<User>(currentUserInFile);
-                    if (userFromFile.Email == Email)
-                        return true;
-                }
+            _makeUpContext = makeUpContext;
+        }
+        static private string filePath = "..\\users.JSON";
+        public async Task<User> getUserById(int id)
+        {
+            User? user = await _makeUpContext.Users.FindAsync(id);
+            User? user2 = await _makeUpContext.Users.Where(u => u.UserId == id).Include(u => u.Orders).FirstOrDefaultAsync();
+            return user2 != null ? user2 : null;
+        }
+        public async Task<User> FindUser(User userToFind)
+        {
+            var users = await _makeUpContext.Users.Where(user => user.Email == userToFind.Email && user.Password == userToFind.Password).ToListAsync();
+            return users.Count() == 0 ? null : users[0];
+        }
+        public async Task<bool> IsUserNameExist(string Email)
+        {
+            User? user2 = await _makeUpContext.Users.Where(u => u.Email == Email).FirstOrDefaultAsync();
+            if (user2 == null)
                 return false;
-            }
+            else
+                return true;
+           
         }
-        public User AddUser(User newUser)
+        public async Task<User> AddUser(User newUser)
         {
-            int numberOfUsers = System.IO.File.ReadLines(filePath).Count();
-            newUser.Id = numberOfUsers + 1;
-            string userJson = JsonSerializer.Serialize(newUser);
-            System.IO.File.AppendAllText(filePath, userJson + Environment.NewLine);
+            await _makeUpContext.Users.AddAsync(newUser);
+            await _makeUpContext.SaveChangesAsync();
             return newUser;
         }
-        public void UpdateUser(int id, User userToUpdate)
+        public async Task UpdateUser(User updatedUser, int id)
         {
-            string textToReplace = string.Empty;
-            using (StreamReader reader = System.IO.File.OpenText(filePath))
+            User userToUpdate = await _makeUpContext.Users.FindAsync(id);
+            if (userToUpdate != null)
             {
-                string currentUserInFile;
-                while ((currentUserInFile = reader.ReadLine()) != null)
-                {
-
-                    User user = JsonSerializer.Deserialize<User>(currentUserInFile);
-                    if (user.Id == id)
-                        textToReplace = currentUserInFile;
-                }
-            }
-            if (textToReplace != string.Empty)
-            {
-                string text = System.IO.File.ReadAllText(filePath);
-                text = text.Replace(textToReplace, JsonSerializer.Serialize(userToUpdate));
-                System.IO.File.WriteAllText(filePath, text);
+                _makeUpContext.Entry(userToUpdate).CurrentValues.SetValues(updatedUser);
+                await _makeUpContext.SaveChangesAsync();
             }
 
         }
-        public User GetUser(int id)
-        {
-            using (StreamReader reader = System.IO.File.OpenText(filePath))
-            {
-                string? currentUserInFile;
-                while ((currentUserInFile = reader.ReadLine()) != null)
-                {
-                    User user = JsonSerializer.Deserialize<User>(currentUserInFile);
-                    if (user.Id == id)
-                        return user;
-                }
-            }
-            return null;
-        }
+
+       
+       
     }
 }

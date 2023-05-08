@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using entities;
 using Microsoft.EntityFrameworkCore;
-using MyShop;
+//using MyShop;
 
 
 namespace Repository;

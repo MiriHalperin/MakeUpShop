@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace entities;
 
-public partial class OrderItem
+public partial class OrderItemDTO
 {
     public int OrderItemId { get; set; }
 
@@ -12,8 +13,10 @@ public partial class OrderItem
     public int OrderId { get; set; }
 
     public int Quantity { get; set; }
+    [JsonIgnore]
 
-    public virtual Order Order { get; set; } = null!;
+    public virtual OrderDTO? Order { get;}
 
-    public virtual Product Product { get; set; } = null!;
+    [JsonIgnore]
+    public virtual ProductDTO? Product { get; set; }
 }
