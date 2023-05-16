@@ -18,7 +18,7 @@ public partial class ProductDTO
 
     public string ImagePath { get; set; } = null!;
 
-    public virtual CategoryDTO? Category { get; set; } = null!;
-    [JsonIgnore]
+    public string CategoryName { get; set; }
+
     public virtual ICollection<OrderItemDTO> OrderItems { get; } = new List<OrderItemDTO>();
 }

@@ -8,6 +8,7 @@ namespace entities;
 public partial class UserDTO
 {
     public int UserId { get; set; }
+    [EmailAddress(ErrorMessage = "Email not valid")]
 
     public string Email { get; set; } = null!;
 

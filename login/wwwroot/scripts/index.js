@@ -1,22 +1,29 @@
 ﻿
 
+//register to api
 async function Register() {
-
+    console.log("hi I came to register")
     const userName = document.getElementById("userNameReg").value;
-    const userPassword = document.getElementById("userPasswordReg").value;
+    const password = document.getElementById("userPasswordReg").value;
     const firstName = document.getElementById("firstName").value;
     const lastName = document.getElementById("lastName").value;
-    //if (passwordStrength(userName)
 
-    const ans = await fetch(`https://localhost:44351/api/users`, {
+
+    const response = await fetch(`https://localhost:44351/api/Users/register`, {
         method: 'Post',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ "Email": userName, "Password": userPassword, "FirstName": firstName, "LastName": lastName })
+        body: JSON.stringify({ "Email": userName, "FirstName": firstName, "LastName": lastName, "Password": password })
 
     })
-    DealWithRegisterAns(ans);
+    if (response.ok) {
+        console.log(response.status)
+        const newUser = await response.json();
+        localStorage.setItem('user', JSON.stringify(newUser));
+      
+    }
+    else { alert('request failed'); }
 }
 
 async function Login() {
@@ -31,8 +38,9 @@ async function Login() {
         body: JSON.stringify({ "Email": userName, "Password": userPassword })
 
     })
-    DealWithLoginAns(ans);
+    console.log(ans)
 }
+
 
 async function Update() {
 
@@ -72,45 +80,6 @@ async function DealWithRegisterAns(ans) {
     }
 }
 
-async function DealWithLoginAns(ans) {
-    const ansJson = await ans.json();
-
-
-    if (ans.status == 200) {
-        localStorage.setItem("user", JSON.stringify(ansJson));
-        document.location = "https://localhost:44351/UserDetails.html";
-    }
-    if (ansJson.errors) {
-        if (ansJson.errors.Email)
-            alert("Email not valid");
-        if (ansJson.errors.Password)
-            alert("password length must be between 5-20");
-    }
-    if (ans.status == 401)
-        alert("Unauthorized");
-}
-
-async function DealWithUpdateAns(ans) {
-    if (ans.status == 204)
-        alert("user name already exist ");
-    else {
-        const ansJson = await ans.json();
-
-        if (ans.status == 200) {
-            localStorage.setItem("user", JSON.stringify(ansJson));
-            LoadUserDetails();
-            alert("update!!!");
-        }
-        if (ansJson.errors) {
-            if (ansJson.errors.Email)
-                alert("Email not valid");
-            if (ansJson.errors.Password)
-                alert("password length must be between 5-20");
-        }
-    }
-
-
-}
 
 async function LoadUserDetails() {
 
@@ -129,7 +98,7 @@ async function passwordStrength(e) {
     const password = document.getElementById("userPasswordReg").value;
     console.log(password);
 
-    const ans = await fetch(`https://localhost:44351/api/users/password`, {
+    const res = await fetch(`https://localhost:44351/api/password`, {
         method: 'Post',
         headers: {
             'Content-Type': 'application/json'
@@ -138,21 +107,7 @@ async function passwordStrength(e) {
 
     })
 
-    if (!ans.ok) {
-        const ansJson = await ans.json();
-        if (ansJson.errors) {
-            if (ansJson.errors.Email)
-                alert("Email not valid");
-            if (ansJson.errors.Password)
-                alert("password length must be between 5-20");
-        }
-    }
-
-    if (ans.ok) {
-        const ansJson = await ans.json();
-        document.getElementById("passwordStrength").setAttribute('value', ansJson);
-        document.getElementById("passwordStrengthTxt").innerHTML = ansJson;
-    }
-
+    const strength = await res.json();
+    document.getElementById("file").setAttribute("value", strength);
 }
 

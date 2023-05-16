@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace entities;
 
 public partial class User
 {
     public int UserId { get; set; }
-
+    [EmailAddress(ErrorMessage = "Email not valid")]
     public string Email { get; set; } = null!;
 
     public string? FirstName { get; set; }

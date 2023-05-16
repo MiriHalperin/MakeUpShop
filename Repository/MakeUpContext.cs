@@ -97,6 +97,7 @@ public partial class MakeUpContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false)
                 .HasColumnName("PRODUCT_NAME");
+            entity.Property(e => e.ImagePath).HasColumnName("image_path");
 
             entity.HasOne(d => d.Category).WithMany(p => p.Products)
                 .HasForeignKey(d => d.CategoryId)
